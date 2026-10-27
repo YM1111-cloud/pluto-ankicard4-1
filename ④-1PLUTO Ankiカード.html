@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>【PLUTO】④-1 フラッシュカード</title>
+ <style>
+ body {
+ font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+ background-color: #f7f9fc;
+ color: #333333;
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ padding: 20px;
+ margin: 0;
+ }
+
+ h1 {
+ font-size: 1.5rem;
+ color: #2c3e50;
+ margin-bottom: 10px;
+ }
+
+ .header-stats {
+ display: flex;
+ justify-content: space-between;
+ width: 100%;
+ max-width: 600px;
+ margin-bottom: 15px;
+ font-size: 1.1rem;
+ font-weight: bold;
+ color: #555;
+ padding: 0 10px;
+ }
+
+ .top-controls {
+ display: flex;
+ flex-wrap: wrap;
+ justify-content: center;
+ gap: 8px;
+ width: 100%;
+ max-width: 600px;
+ margin-bottom: 20px;
+ }
+
+ .top-btn {
+ flex: 1;
+ min-width: 130px;
+ padding: 10px 12px;
+ font-size: 0.95rem;
+ border: none;
+ border-radius: 8px;
+ cursor: pointer;
+ font-weight: bold;
+ color: white;
+ transition: background-color 0.2s, transform 0.1s;
+ box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+ }
+
+ .top-btn:active { transform: scale(0.98); }
+ 
+.btn-all { background-color: #7f8c8d; }
+ .btn-all:hover { background-color: #6c7a7d; }
+ .btn-unanswered { background-color: #3498db; }
+ .btn-unanswered:hover { background-color: #2980b9; }
+ .btn-review { background-color: #e67e22; }
+ .btn-review:hover { background-color: #d35400; }
+ .btn-incorrect { background-color: #9b59b6; }
+ .btn-incorrect:hover { background-color: #8e44ad; }
+
+ .mode-indicator {
+ font-size: 0.9rem;
+ color: #e67e22;
+ font-weight: bold;
+ margin-bottom: 10px;
+ }
+
+ #flashcard {
+ background-color: #ffffff;
+ width: 100%;
+ max-width: 600px;
+ min-height: 400px;
+ border-radius: 16px;
+ box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ align-items: center;
+ padding: 30px;
+ box-sizing: border-box;
+ text-align: center;
+ position: relative;
+ }
+
+ #front-side, #back-side {
+ width: 100%;
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ align-items: center;
+ }
+ 
+#back-side {
+ display: none;
+ text-align: left;
+ align-items: flex-start;
+ }
+
+ .date-badge {
+ font-size: 0.85rem;
+ background-color: #edf2f7;
+ color: #4a5568;
+ padding: 6px 14px;
+ border-radius: 20px;
+ margin-bottom: 5px;
+ font-weight: bold;
+ display: inline-block;
+ }
+
+ .srs-badge {
+ font-size: 0.8rem;
+ color: #e67e22;
+ margin-bottom: 20px;
+ font-weight: bold;
+ }
+
+ .english-text {
+ font-size: 1.4rem;
+ font-weight: bold;
+ color: #1a1a1a;
+ margin-bottom: 25px;
+ line-height: 1.4;
+ text-align: center;
+ }
+
+ .english-text-back {
+ font-size: 1.2rem;
+ font-weight: bold;
+ color: #34495e;
+ margin-bottom: 15px;
+ line-height: 1.4;
+ text-align: left;
+ width: 100%;
+ border-bottom: 2px dashed #e1e8ed;
+ padding-bottom: 15px;
+ }
+
+ .japanese-text {
+ font-size: 1.2rem;
+ font-weight: bold;
+ color: #2c3e50;
+ margin-bottom: 20px;
+ line-height: 1.6;
+ width: 100%;
+ border-bottom: 2px solid #e1e8ed;
+ padding-bottom: 15px;
+ }
+
+ .note-box {
+ background-color: #fff9e6;
+ border-left: 4px solid #f5a623;
+ padding: 15px;
+ border-radius: 4px;
+ font-size: 1rem;
+ line-height: 1.6;
+ color: #5c4716;
+ width: 100%;
+ box-sizing: border-box;
+ }
+
+ #play-audio-btn {
+ font-size: 1.1rem;
+ padding: 12px 24px;
+ border-radius: 30px;
+ background-color: #4a90e2;
+ color: white;
+ border: none;
+ cursor: pointer;
+ box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
+ transition: transform 0.1s, background-color 0.2s;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ gap: 8px;
+ font-weight: bold;
+ }
+
+ #play-audio-btn:active {
+ transform: scale(0.95);
+ background-color: #357abd;
+ }
+
+ .controls {
+ display: flex;
+ gap: 10px;
+ margin-top: 30px;
+ width: 100%;
+ max-width: 600px;
+ justify-content: center;
+ }
+
+ .action-btn {
+ flex: 1;
+ padding: 15px 10px;
+ font-size: 1rem;
+ border: none;
+ border-radius: 8px;
+ cursor: pointer;
+ font-weight: bold;
+ transition: background-color 0.2s, opacity 0.2s;
+ }
+
+ #prev-btn { background-color: #e2e8f0; color: #4a5568; }
+ #flip-btn { background-color: #4a90e2; color: white; }
+ #next-btn { background-color: #e2e8f0; color: #4a5568; }
+
+ .eval-btn {
+ flex: 1;
+ padding: 15px 5px;
+ font-size: 1rem;
+ border: none;
+ border-radius: 8px;
+ cursor: pointer;
+ font-weight: bold;
+ color: white;
+ }
+
+ #back-to-front-btn { background-color: #95a5a6; }
+ #back-to-front-btn:hover { background-color: #7f8c8d; }
+ #wrong-btn { background-color: #e74c3c; }
+ #wrong-btn:hover { background-color: #c0392b; }
+ 
+#correct-btn { background-color: #2ecc71; }
+ #correct-btn:hover { background-color: #27ae60; }
+
+ .empty-state {
+ font-size: 1.5rem;
+ color: #2ecc71;
+ font-weight: bold;
+ text-align: center;
+ line-height: 1.5;
+ }
+ </style>
+</head>
+<body>
+
+ <h1>🎧 【PLUTO】④-1 フラッシュカード</h1>
+
+ <div class="header-stats">
+ <span id="progress-text">1 / 130</span>
+ <span id="score-text">正解数: 0</span>
+ </div>
+ 
+<div class="mode-indicator" id="mode-indicator">現在のモード：📁 全問</div>
+
+ <div class="top-controls">
+ <button class="top-btn btn-all" onclick="setMode('all')">📁 全問</button>
+ <button class="top-btn btn-unanswered" onclick="jumpToUnanswered()">🆕 未回答へジャンプ</button>
+ <button class="top-btn btn-review" onclick="setMode('review')">📅 今日の復習</button>
+ <button class="top-btn btn-incorrect" onclick="setMode('incorrect')">🎯 未正解</button>
+ </div>
+
+ <div id="flashcard">
+ <div id="front-side">
+ <div class="date-badge" id="date-badge">最終回答日：未回答</div>
+ <div class="srs-badge" id="srs-badge"></div>
+ <div class="english-text" id="front-eng-content"></div>
+ <button id="play-audio-btn">🔊 音声を聴く</button>
+ </div>
+
+ <div id="back-side">
+ <div class="english-text-back" id="back-eng-content"></div>
+ <div class="japanese-text" id="jap-content"></div>
+ <div class="note-box" id="note-content"></div>
+ </div>
+ </div>
+
+ <div class="controls" id="controls-front">
+ <button id="prev-btn" class="action-btn" onclick="prevCard()">◀ 前へ</button>
+ <button id="flip-btn" class="action-btn" onclick="flipCard()">🔄 裏返す</button>
+ <button id="next-btn" class="action-btn" onclick="nextCard()">次へ ▶</button>
+ </div>
+
+ <div class="controls" id="controls-back" style="display: none;">
+ <button id="back-to-front-btn" class="eval-btn" onclick="returnToFront()">🔙 表面に戻る</button>
+ <button id="wrong-btn" class="eval-btn" onclick="markIncorrect()">❌ 覚えてない</button>
+ <button id="correct-btn" class="eval-btn" onclick="markCorrect()">◯ 完璧！</button>
+ </div>
+
+ <script>
+ const cardsData = [
+{"en": "Hey there, friend.", "jp": "やあ、ご苦労様。[cite: 1]", "note": "Hey there は親しい相手や目下に対する温かい挨拶表現。friend はここでは警護の警官への親しみを込めた呼びかけ。[cite: 1]"},
+{"en": "Yes, sir?", "jp": "はい、博士。[cite: 1]", "note": "Yes, sir? は上司や目上の人からの呼びかけに対する丁寧な応答（「何でしょうか？」）。[cite: 1]"},
+{"en": "You've been standing a goodly amount of time.", "jp": "ずいぶんと長い時間立っているね。[cite: 1]", "note": "a goodly amount of... は「かなりの量の、相当な」。a good deal of... と同義の少し古風で品のある表現。[cite: 1]"},
+{"en": "Why not take yourself a little break?", "jp": "少し休憩でも取ったらどうだい？[cite: 1]", "note": "Why not + 動詞の原形 は「〜したらどうですか？」という軽い提案。take oneself a break は「（自分が）休憩を取る」。[cite: 1]"},
+{"en": "I couldn't, Professor.", "jp": "そうはいきません、博士。[cite: 1]", "note": "I couldn't (do that) は仮定法的なニュアンスを含む謙遜・辞退の表現（「私にはそんなことはできません」）。[cite: 1]"},
+{"en": "Not while I'm on duty.", "jp": "勤務中なのですから。[cite: 1]", "note": "while I'm on duty は「勤務中で、職務についている間」。対義語は off duty（勤務外）。[cite: 1]"},
+{"en": "Protecting you is of the utmost importance.", "jp": "博士を護衛することが最優先事項なのです。[cite: 1]", "note": "be of the utmost importance は「極めて重要である」。be + of + 抽象名詞（of importance = important）の格調高い構文。[cite: 1]"},
+{"en": "No one's coming after me.", "jp": "誰もワシの命なんて狙いやしないよ。[cite: 1]", "note": "come after... は「〜を追いかける、〜の命を狙う、〜を襲う」。[cite: 1]"},
+{"en": "I swear.", "jp": "本当さ（誓ってもいい）。[cite: 1]", "note": "I swear. は「誓うよ、嘘じゃない、本当だ」という主張を強める口語表現。[cite: 1]"},
+{"en": "This is too pleasant of a Sunday for a homicide.", "jp": "こんなに気持ちの良い日曜日に殺人なんて似合わないだろう。[cite: 1]", "note": "too + 形容詞 + of a + 名詞 は「〜するにはあまりにも…な名詞」。too pleasant a Sunday と同義の現代口語構文。homicide は「殺人、殺人事件」。[cite: 1]"},
+{"en": "But if I should lower my guard and something were to happen to you, sir…", "jp": "ですが、私が気を緩めて博士の身に万一のことがあったら…[cite: 1]", "note": "if I should... / if something were to happen... は仮定法未来の二重構造。「万一〜ならば…」という万全を期す警察官の強い警戒感を表す構文。lower one's guard は「警戒を緩める」。[cite: 1]"},
+{"en": "I know the Bora Fact-Finding Mission may have lost a few old members recently,", "jp": "ボラ調査団の古い仲間が最近何人か亡くなったのは知っているが、[cite: 1]", "note": "Fact-Finding Mission は「（実態・事実関係の）現地調査団」。may have + 過去分詞 は「〜したかもしれない」。[cite: 1]"},
+{"en": "but it doesn't mean the sky is falling.", "jp": "だからといって世界が滅びるわけじゃない。[cite: 1]", "note": "the sky is falling は「大変な地殻変動が起きる、天が落ちてくる（＝世も末だ、大パニックだ）」という寓話（Chicken Little）由来のイディオム。[cite: 1]"},
+{"en": "Really. I don't see why anyone would go to the trouble of killing me to begin with.", "jp": "本当さ。そもそも、ワシをわざわざ殺しようとする者がいるとは思えんよ。[cite: 1]", "note": "go to the trouble of -ing は「わざわざ〜する、手間をかけて〜する」。to begin with は「そもそも、第一に」。I don't see why... は「なぜ〜なのか理解できない」。[cite: 1]"},
+{"en": "Most of all, I can't enjoy this rare day off", "jp": "第一、せっかくの珍しい休日を楽しめないじゃないか、[cite: 1]", "note": "Most of all は「何よりも、第一に」。rare day off は「滅多にない休日」。[cite: 1]"},
+{"en": "with you stuck to me like very diligent glue.", "jp": "君がまるで真面目な粘着糊みたいにぴったり張り付いていてはね。[cite: 1]", "note": "with + 目的語 + 過去分詞（付帯状況のwith）。stuck to me は「私に張り付いて」。diligent glue（勤勉な粘着剤）というお茶の水博士らしいユーモラスな比喩。[cite: 1]"},
+{"en": "Forgive the intrusion, sir.", "jp": "でしゃばった真似をして申し訳ありません、博士。[cite: 1]", "note": "Forgive the intrusion. は「邪魔をして（でしゃばって）すみません」というフォーマルな謝罪フレーズ。[cite: 1]"},
+{"en": "Oh, no. Don't apologize.", "jp": "いやいや、謝る必要はないよ。[cite: 1]", "note": "Don't apologize. は「謝らないでくれ、気にしなくていい」。[cite: 1]"},
+{"en": "You're fine.", "jp": "気にしないでくれ。[cite: 1]", "note": "You're fine. は「大丈夫ですよ、問題ないです」と相手を安心させる定番の返答。[cite: 1]"},
+{"en": "I'm just being a bit of a pill is all.", "jp": "ワシが少し気難しく愚痴をこぼしているだけさ。[cite: 1]", "note": "be a bit of a pill は「嫌な奴である、気難しい、うっとうしい存在である」という口語イディオム。...is all は「〜というだけのことさ（just ...）」。[cite: 1]"},
+{"en": "By the by, what's your name, son?", "jp": "ところで、君の名前は何というのかね？[cite: 1]", "note": "By the by は By the way の少し古風で親しみのある言い回し（ところで）。son は若者に対する温かい呼びかけ。[cite: 1]"},
+{"en": "Sir. I am PPB-4988-1327.", "jp": "はい。私はPPB-4988-1327です。[cite: 1]", "note": "製造番号（登録番号）で答えるロボット警官の固い応答。[cite: 1]"},
+{"en": "A fine registration number, but not what I meant.", "jp": "立派な登録番号だが、ワシが聞いたのはそういうことじゃない。[cite: 1]", "note": "A fine... は「立派な〜だ」。not what I meant は「ワシが意図した（尋ねた）ことではない」。[cite: 1]"},
+{"en": "You have a name, do you not?", "jp": "名前があるんだろう？[cite: 1]", "note": "..., do you not? は付加疑問文（〜ですね？）。have a name（固有名詞・名前を持つ）。[cite: 1]"},
+{"en": "I'd love to hear it.", "jp": "ぜひ聞かせておくれ。[cite: 1]", "note": "I'd love to... は I would love to... の縮約で「喜んで〜したい」。[cite: 1]"},
+{"en": "Yes, sir. I'm called Yujiro.", "jp": "はい、博士。『裕次郎』と呼ばれています。[cite: 1]", "note": "I'm called... は「〜と呼ばれている」。人間らしい名前（裕次郎）を明かすシーン。[cite: 1]"},
+{"en": "Quite the moniker.", "jp": "なかなか威勢の良い名前じゃないか。[cite: 1]", "note": "Quite the + 名詞 は「かなりの〜だ、実に立派な〜だ」。moniker は「名前、ニックネーム、あだ名」を意味する口語表現。[cite: 1]"},
+{"en": "That's the sort of name that will open doors for you.", "jp": "出世の道を開いてくれそうな名前だぞ。[cite: 1]", "note": "open doors for someone は「（人にとって）機会を開く、出世の道を開く、成功への扉を開く」という超重要イディオム。[cite: 1]"},
+{"en": "Sir?", "jp": "えっ、本当ですか？[cite: 1]", "note": "Sir? は驚きや聞き返しを表す応答。[cite: 1]"},
+{"en": "Maybe you'll lead the department someday.", "jp": "いつか警視庁（本部長）を率いる存在になるかもしれん。[cite: 1]", "note": "lead the department は「部署（警察組織）を率いる、トップに立つ」。someday は「いつの日か」。[cite: 1]"},
+{"en": "Uh, Professor! That seems unsafe!", "jp": "あ、博士！ それは危険です！[cite: 1]", "note": "That seems unsafe! は「危険に見えます！ 危険です！」。[cite: 1]"},
+{"en": "Well, I'll be!", "jp": "おや、驚いた！[cite: 1]", "note": "Well, I'll be!（Well, I'll be damned! の略）は「おやまあ！ これは驚いた！」という感嘆の超定番口語。[cite: 1]"},
+{"en": "It's a little robot dog. Someone must have thrown it away.", "jp": "小さなロボット犬だな。誰かが捨てたのに違いない。[cite: 1]", "note": "must have + 過去分詞 は「〜したに違いない」。throw away は「（ゴミなどを）捨てる」。[cite: 1]"},
+{"en": "Please step back.", "jp": "お下がりください。[cite: 1]", "note": "step back は「後ろへ下がる、退く」。[cite: 1]"},
+{"en": "There could be a bomb inside.", "jp": "中に爆弾が仕掛けられているかもしれません。[cite: 1]", "note": "could は「〜の可能性がある」という不確実な推測の助動詞。[cite: 1]"},
+{"en": "I'm sure it's fine.", "jp": "大丈夫だよ、きっと。[cite: 1]", "note": "I'm sure it's fine. は相手の不安を和らげる「きっと問題ない」という応答。[cite: 1]"},
+{"en": "It doesn't seem to be explosive.", "jp": "爆発物ではなさそうですね。[cite: 1]", "note": "explosive は名詞で「爆発物」、形容詞で「爆発性の」。It doesn't seem to be... は「〜のようには見えない」。[cite: 1]"},
+{"en": "You've seen some hard living.", "jp": "お前、苦労してきたんだな。[cite: 1]", "note": "see some hard living は「つらい生活（苦難）を経験してきた」。seen は過酷な境遇を耐えてきたロボット犬への温かいまなざし。[cite: 1]"},
+{"en": "Let's take this little fella back home.", "jp": "このちっちゃな仲間を家に連れて帰ろう。[cite: 1]", "note": "fella (fellow) は「仲間、やつ、ちっちゃい奴」。take ... back home で「〜を家に連れて帰る」。[cite: 1]"},
+{"en": "Excuse me.", "jp": "失礼ですが。[cite: 1]", "note": "会話に割り込んだり尋ねたりする際の丁寧な置き言葉。[cite: 1]"},
+{"en": "But the robot dog. What are your plans for it, sir?", "jp": "そのロボット犬ですが、どうなさるおつもりですか？[cite: 1]", "note": "What are your plans for... は「〜をどうする予定・計画ですか？」。[cite: 1]"},
+{"en": "Fix it up, of course.", "jp": "もちろん修理するのさ。[cite: 1]", "note": "fix up は「（壊れたものを）修理する、手入れする」。of course は「勿論」。[cite: 1]"},
+{"en": "Fix it?", "jp": "修理なさるのですか？[cite: 1]", "note": "相手の言葉に対する驚きの聞き返し。[cite: 1]"},
+{"en": "Not for nothing that I'm the head of the Ministry of Science.", "jp": "ワシが科学省長官を務めているのは伊達じゃないからの。[cite: 1]", "note": "It is not for nothing that... は「〜なのは伊達ではない、伊達に〜しているわけではない、相応の理由がある」という格調高い慣用句。[cite: 1]"},
+{"en": "Hang on, little guy.", "jp": "もう少しの辛抱だぞ、ちび助。[cite: 1]", "note": "Hang on は「頑張れ、耐えろ、待て」。little guy は親しみを込めた呼びかけ。[cite: 1]"},
+{"en": "You'll be back on your feet soon.", "jp": "すぐに元通り元気になるからな。[cite: 1]", "note": "be back on one's feet は「（病気や故障から回復して）再び立ち上がる、元気を取り戻す、生活を立て直す」という超重要イディオム。[cite: 1]"},
+{"en": "Your actuator has weathered a lot of damage,", "jp": "アクチュエーターが随分傷んでいるな、[cite: 1]", "note": "actuator は駆動装置（アクチュエーター）。weather は動詞で「（嵐や損傷などに）耐える、乗り越える、風化する」。[cite: 1]"},
+{"en": "but the circuits in your brain are the real issue here.", "jp": "だが本当の問題は、脳の回路の方だ。[cite: 1]", "note": "circuits in your brain（頭脳の回路）。the real issue here は「ここでの本当の問題・懸案事項」。[cite: 1]"},
+{"en": "Ochanomizu here.", "jp": "お茶の水だ。[cite: 1]", "note": "電話での名乗り。「こちらお茶の水だ」。[cite: 1]"},
+{"en": "Professor. Good afternoon.", "jp": "博士、こんにちは。[cite: 1]", "note": "日中の挨拶。[cite: 1]"},
+{"en": "I'm sorry to call you on your day off.", "jp": "お休みの日に電話して大変申し訳ありません。[cite: 1]", "note": "call someone on one's day off は「休日に人に電話する」。[cite: 1]"},
+{"en": "Not the Ministry of Defense again.", "jp": "また国防省からか。[cite: 1]", "note": "Ministry of Defense は「国防省」。Not ... again で「また〜か（うんざりだ）」。[cite: 1]"},
+{"en": "I really do apologize for bothering you so much.", "jp": "何度もご連絡して本当に申し訳なく思っております。[cite: 1]", "note": "I do apologize... の do は動詞の強調（心からお詫びします）。bother は「邪魔をする、手を焼かせる」。[cite: 1]"},
+{"en": "But the committee meeting is next week, and they're demanding an answer.", "jp": "ですが来週委員会があり、回答を求められているのです。[cite: 1]", "note": "committee meeting は「委員会」。demand an answer は「回答・返答を要求する」。[cite: 1]"},
+{"en": "They wanna send more troops to the Kingdom of Persia.", "jp": "ペルシア王国へさらなる部隊（兵力）を派遣したいと考えています。[cite: 1]", "note": "send troops to... は「〜へ軍隊・兵力を派遣する」。Kingdom of Persia（ペルシア王国）。[cite: 1]"},
+{"en": "As you know, Professor, we can't move forward on this without your permission, and time is growing short.", "jp": "博士もご存じの通り、長官の許可なしには進められませんし、残された時間が少なくなっています。[cite: 1]", "note": "move forward on... は「〜を進める、前進させる」。without your permission は「あなたの許可なしに」。time is growing short は「時間が押し迫っている、残り少ない」。[cite: 1]"},
+{"en": "You can pester me as often as you want, but I've made up my mind!", "jp": "何度しつこく迫られようと、ワシの決心は変わらんよ！[cite: 1]", "note": "pester は「（人を）しつこく悩ませる、困らせる、うるさくねだる」。as often as you want で「何度でも好きなだけ」。make up one's mind は「決心する」。[cite: 1]"},
+{"en": "Please, sir.", "jp": "そこをなんとかお願いします、博士。[cite: 1]", "note": "相手にお願い・懇願する際の言葉。[cite: 1]"},
+{"en": "Robot or human, I don't give a damn!", "jp": "ロボットであろうと人間であろうと、関係ない！[cite: 1]", "note": "Robot or human は Whether it's robot or human の省略。don't give a damn は「知ったことか、ビタ一文気にしない」という強烈な拒絶表現。[cite: 1]"},
+{"en": "No more killing each other!", "jp": "これ以上殺し合いなど絶対にさせん！[cite: 1]", "note": "No more + -ing で「これ以上〜させるな、〜はもうご免だ」。kill each other は「互いに殺し合う」。[cite: 1]"},
+{"en": "The United States of Thracia insists on the matter.", "jp": "トラキア合衆国がこの件を強く主張（要求）しているのです。[cite: 1]", "note": "United States of Thracia（トラキア合衆国）。insist on... は「〜を強く主張する、譲らない」。[cite: 1]"},
+{"en": "Well, it's not their decision to make!", "jp": "彼らが決定することではない！[cite: 1]", "note": "It is not one's decision to make は「それはその人が決定すべきことではない（決める権利はない）」という重要構文。[cite: 1]"},
+{"en": "No self-respecting scientist will create robotic weaponry!", "jp": "自尊心のある科学者なら、ロボット兵器など作らんよ！[cite: 1]", "note": "self-respecting は「自尊心のある、矜持を持った」。robotic weaponry は「ロボット兵器」。[cite: 1]"},
+{"en": "Without fail.", "jp": "毎度のことながら（参るわい）。[cite: 1]", "note": "Without fail は本来「必ず」という意味だが、ここでは電話を切った後「いつものように（必ず電話が来るわい）」という溜息交じりの呟き。[cite: 1]"},
+{"en": "Don't you know when to take a hint? Oh?", "jp": "諦め（空気を読むこと）を知らんのか…おや？[cite: 1]", "note": "know when to take a hint は「いつ身を引くべきか（空気を読むべきか）を弁える」。直訳は「ヒントを察するときを知らないのか」。[cite: 1]"},
+{"en": "What you yelling about, Grandpa?", "jp": "おじいちゃん、何を大声で怒鳴ってるの？[cite: 1]", "note": "What (are) you yelling about? のカジュアルな省略。yell は「大声で叫ぶ、怒鳴る」。[cite: 1]"},
+{"en": "Oh, goodness. Hello there, Takashi. Been a while, yeah?", "jp": "おやまあ、タカシじゃないか。久しぶりだねえ？[cite: 1]", "note": "Oh, goodness は「おやまあ」という柔らかい驚きの言葉。Been a while は It has been a while（久しぶりだね）。[cite: 1]"},
+{"en": "Uh, I can call back if you're busy.", "jp": "忙しいなら、後でかけ直すよ？[cite: 1]", "note": "call back は「電話を掛け直す」。if you're busy で「もし忙しいなら」。[cite: 1]"},
+{"en": "I've always got the time for you.", "jp": "お前のために割く時間ならいつだってあるさ。[cite: 1]", "note": "have got time for... で「〜のための時間がある」。Grandpaの愛が溢れる表現。[cite: 1]"},
+{"en": "Something you'd like to talk about?", "jp": "何か話したいことでもあるのかい？[cite: 1]", "note": "Is there something you would like to talk about? の省略。[cite: 1]"},
+{"en": "Mm-hmm. There was a tornado offshore that showed up out of nowhere today.", "jp": "うん。今日、沖合で突然どこからともなく竜巻が現れたんだ。[cite: 1]", "note": "tornado offshore は「沖合の竜巻」。show up out of nowhere は「どこからともなく現れる、突如出現する」という超頻出イディオム。[cite: 1]"},
+{"en": "Now me and Bobby are playing together!", "jp": "今、僕とボビーはいっしょに遊んでるよ！[cite: 1]", "note": "me and Bobby は口語的な主語表現（Bobby and I と同義）。[cite: 1]"},
+{"en": "So the two of you are getting along?", "jp": "二人仲良くやっているかい？[cite: 1]", "note": "get along は「（仲良く）やっていく、意気投合する」。the two of you で「君たち二人」。[cite: 1]"},
+{"en": "Oh, you bet!", "jp": "うん、もちろんだよ！[cite: 1]", "note": "You bet! は「勿論さ！ まったくその通りさ！」という明るい同意の口語フレーズ。[cite: 1]"},
+{"en": "Did you know you gave him to me two whole years ago now?", "jp": "おじいちゃんがボビーをくれたの、ちょうど丸2年前だって知ってた？[cite: 1]", "note": "two whole years ago で「丸2年も前に」。give A to B（AをBに与える）。[cite: 1]"},
+{"en": "Some of the kids have robot dogs that are newer,", "jp": "周りの子たちはもっと新しいロボット犬を持ってるけど、[cite: 1]", "note": "Some of the kids は「子供たちの中には」。newer（より新しい）。[cite: 1]"},
+{"en": "but Bobby is better than all of their dogs put together.", "jp": "ボビーはみんなの犬を全部合わせたってそれよりすごいんだ！[cite: 1]", "note": "put together は「全て合わせた、束にしても」。A is better than B put together で「Bを全て合わせてもAの方が素晴らしい」という最高級の称賛。[cite: 1]"},
+{"en": "He plays with me every single day.", "jp": "毎日欠かさず僕と遊んでくれるんだ。[cite: 1]", "note": "every single day は「毎日欠かさず、一日たりとも休まず」という強調表現。[cite: 1]"},
+{"en": "What a pal.", "jp": "最高の相棒だなあ。[cite: 1]", "note": "What a pal! は「なんて良いやつ（相棒）なんだ！」という感嘆文。pal は「親友、相棒」。[cite: 1]"},
+{"en": "What are you doing today, Grandpa? Something fun?", "jp": "おじいちゃんは今日何してるの？ 何か楽しいこと？[cite: 1]", "note": "Something fun? は Are you doing something fun? の省略。[cite: 1]"},
+{"en": "I'm fixing up a robot dog I found.", "jp": "拾ったロボット犬を修理しているところさ。[cite: 1]", "note": "fixing up は「修理している」。I found は関係代名詞節（ワシが見つけた）。[cite: 1]"},
+{"en": "This fella's much older than Bobby there.", "jp": "そっちのボビーよりずっと昔の奴なんじゃ。[cite: 1]", "note": "much older（ずっと古い・年老いた）。there は「そっちの」。[cite: 1]"},
+{"en": "Older than Bobby? Are you sure you can fix it?", "jp": "ボビーより古いの？ 本当に直せるの？[cite: 1]", "note": "Are you sure (that)...? は「本当に〜できるの？ 確信があるの？」。[cite: 1]"},
+{"en": "Course I can.", "jp": "もちろん直せるさ。[cite: 1]", "note": "Course I can は (Of) course I can の口語短縮形。[cite: 1]"},
+{"en": "Just kidding, Grandpa. You can fix anything.", "jp": "冗談だよ、おじいちゃん。おじいちゃんは何だって直せるもんね。[cite: 1]", "note": "Just kidding は「冗談だよ、からかっただけさ」。You can fix anything（おじいちゃんに直せないものはない）。[cite: 1]"},
+{"en": "That's right. You can count on it.", "jp": "その通り。任せておきなさい。[cite: 1]", "note": "You can count on it (or me). は「任せてくれ、頼りにしてくれていい、間違い無い」という定番の約束表現。[cite: 1]"},
+{"en": "Talk to you later?", "jp": "また後で話そうね？[cite: 1]", "note": "Talk to you later? は「また後でね（See you later）」。[cite: 1]"},
+{"en": "You betcha.", "jp": "ああ、もちろんだとも。[cite: 1]", "note": "You betcha は You bet / You betcha! の愛嬌ある口語変形（「了解、勿論だとも」）。[cite: 1]"},
+{"en": "Back to it, then.", "jp": "さて、作業に戻るとするか。[cite: 1]", "note": "Back to it は (Get) back to work / it の省略で「さあ、仕事（作業）に戻ろう」。[cite: 1]"},
+{"en": "I know it's a long shot, but I'm looking for a KD-8083 booster", "jp": "ダメ元で聞くのだが、KD-8083ブースターと、[cite: 1]", "note": "a long shot は「成功の確率が低い賭け、ダメ元、望み薄なこと」。look for... は「〜を探す」。[cite: 1]"},
+{"en": "and an RSC-2969 router.", "jp": "RSC-2969ルーターを探しておってな。[cite: 1]", "note": "部品の型番を指定して業者に電話で問い合わせているシーン。[cite: 1]"},
+{"en": "They're practically museum pieces.", "jp": "それらはもう骨董品（博物館展示レベル）ですよ。[cite: 1]", "note": "practically は「事実上、ほぼ、実質的に」。museum piece は「骨董品、時代遅れの代物、博物館に置くような品」。[cite: 1]"},
+{"en": "I called a bunch of suppliers, but I'm not having any luck.", "jp": "色々なサプライヤーに電話したんじゃが、サッパリ手に入らんのだ。[cite: 1]", "note": "a bunch of... は「たくさんの〜」。not have any luck で「全くついていない、うまくいかない」。[cite: 1]"},
+{"en": "Ah. Says here that they've both been discontinued.", "jp": "ああ…手元のデータによると、どちらも生産終了（廃盤）になっていますね。[cite: 1]", "note": "Says here that... は「（画面・データに）〜と書いてある、示されている」。discontinue は「（製造・販売を）中止する、廃盤にする」。[cite: 1]"},
+{"en": "Nakamine Trading might stock a few of 'em.", "jp": "ナカミネ貿易ならいくつか在庫があるかもしれませんが…[cite: 1]", "note": "Nakamine Trading（ナカミネ貿易）。stock は動詞で「〜を在庫として抱える、ストックする」。'em は them の縮約。[cite: 1]"},
+{"en": "Not in this case. There's just no demand anymore.", "jp": "いや、今回は駄目ですね。もう需要が完全にゼロなんです。[cite: 1]", "note": "Not in this case は「今回は当てはまらない、ダメだ」。no demand anymore で「これ以上需要がない」。[cite: 1]"},
+{"en": "So I see.", "jp": "そうか、やはりな。[cite: 1]", "note": "So I see は「なるほど、見ての通りだね、分かりました」という納得の返答。[cite: 1]"},
+{"en": "It looks like they completely overhauled the specs for these things about four years ago.", "jp": "約4年前にそれらの規格（スペック）が完全に刷新されたようですね。[cite: 1]", "note": "overhaul は「〜を徹底点検する、全面的に改変・刷新する」。specs (specifications) は「製品仕様、規格」。[cite: 1]"},
+{"en": "Should I keep up the search?", "jp": "もう少し捜索を続けましょうか？[cite: 1]", "note": "keep up... は「〜を続ける、維持する」。Should I...? で「〜しましょうか？」。[cite: 1]"},
+{"en": "No, it's okay. Thanks for your help.", "jp": "いや、いいんじゃ。助かったよ、ありがとう。[cite: 1]", "note": "Thanks for your help. は手助けに対する感謝の定番表現。[cite: 1]"},
+{"en": "I betcha we changed those parts you need in the name of so-called 'progress.'", "jp": "いわゆる『進歩』の名のもとに、必要な部品を勝手に変えてしまったんじゃろうな。[cite: 1]", "note": "in the name of... は「〜の名のもとに」。so-called は「いわゆる〜と呼ばれる」。I betcha (I bet) で「〜に違いない」。技術至上主義への皮肉。[cite: 1]"},
+{"en": "Let's see if I'm still any good doing this barehanded.", "jp": "素手（自分の手作業）でどこまでできるか、腕試しといこうか。[cite: 1]", "note": "Let's see if... は「〜かどうか試してみよう、見てみよう」。be any good at... は「〜が得意だ、腕が鈍っていない」。barehanded は「素手で、道具に頼らず」。[cite: 1]"},
+{"en": "Sorry, little guy.", "jp": "すまないな、ちび助…[cite: 1]", "note": "力を尽くしたが及ばなかったロボット犬への詫び。[cite: 1]"},
+{"en": "I tried my best to help you, but it wasn't enough.", "jp": "ワシも全力を尽くしたんじゃが、力及ばなかったよ。[cite: 1]", "note": "try one's best は「全力を尽くす」。wasn't enough で「十分ではなかった」。[cite: 1]"},
+{"en": "Not your fault. You tried your best too.", "jp": "お前が悪いんじゃない。お前も精一杯頑張ったからの。[cite: 1]", "note": "Not your fault は「お前のせいじゃない、お前は悪くない」。[cite: 1]"},
+{"en": "Whoever you belonged to,", "jp": "お前が誰のものであったにせよ、[cite: 1]", "note": "Whoever + 主語 + 動詞（〜が誰であったとしても）。belong to... で「〜に所属する、〜のものである」。[cite: 1]"},
+{"en": "they must have taken top-notch care of you your whole life. Yes, they did.", "jp": "元の飼い主はお前を生涯とても大切にかわいがってくれたに違いないよ。[cite: 1]", "note": "take top-notch care of... は「〜を最高の（一流の）手厚さで世話する・可愛がる」。top-notch は「最高の、一流の」という口語形容詞。[cite: 1]"},
+{"en": "That's the reason you've lasted as long as you have. I'm sure of it.", "jp": "だからこそ、お前はこれまでこんなにも長く持ちこたえられたんじゃ。間違いない。[cite: 1]", "note": "last は動詞で「（製品や寿命が）持つ、持ちこたえる、長持ちする」。be sure of... で「〜を確信している」。[cite: 1]"},
+{"en": "It's plain as day that somebody really loved you.", "jp": "誰かがお前を心から愛していたことは、一目瞭然だよ。[cite: 1]", "note": "as plain as day (or plain as the nose on your face) は「火を見るより明らかだ、一目瞭然だ」という最重要慣用表現。[cite: 1]"},
+{"en": "Even now, you're still trying to get up to play with me?", "jp": "息絶える寸前まで、ワシと遊ぼうとして起き上がろうとしてくれたのかい？[cite: 1]", "note": "Even now で「今でさえ、最後の瞬間まで」。get up は「起き上がる」。[cite: 1]"},
+{"en": "Just rest. You've done enough.", "jp": "もう休みなさい。お前は十分に頑張ったよ。[cite: 1]", "note": "Just rest. は「ただ休みなさい」。You've done enough. は労いの言葉（「お前は十分尽くしてくれた」）。[cite: 1]"},
+{"en": "Who could it be so early?", "jp": "こんな朝早くに誰じゃろう？[cite: 1]", "note": "Who could it be...? は「一体誰だろう（こんな時間に）」という疑問表現。[cite: 1]"},
+{"en": "Professor.", "jp": "博士。[cite: 1]", "note": "訪問者を告げる裕次郎。[cite: 1]"},
+{"en": "Ah, good morning, Yujiro.", "jp": "ああ、おはよう、裕次郎。[cite: 1]", "note": "朝の挨拶。[cite: 1]"},
+{"en": "I tried my best to save that robot dog, but…", "jp": "あのロボット犬を助けようと全力を尽くしたんじゃが…[cite: 1]", "note": "さっきの出来事を報告するお茶の水博士。[cite: 1]"},
+{"en": "Actually, sir, I have a gentleman here who claims to be the dog's owner.", "jp": "実は博士、犬の飼い主だと主張するお方が見えております。[cite: 1]", "note": "a gentleman who claims to be... は「〜だと自称する（主張する）男性」。claim は「主張する、申し出る」。[cite: 1]"},
+{"en": "I'll check his identification and do a full body scan before--", "jp": "身元を確認し、全身のスキャンを行ってからお通しし--[cite: 1]", "note": "check identification で「身元確認をする」。full body scan は「全身スキャン」。[cite: 1]"},
+{"en": "There's no need for all that. Just show him in.", "jp": "そんな大げさなことは要らんよ。通しておくれ。[cite: 1]", "note": "There's no need for... は「〜の必要はない」。show someone in は「（人を）中へ通す、案内する」。[cite: 1]"},
+{"en": "But, sir?", "jp": "ですが、博士？[cite: 1]", "note": "警護として心配する裕次郎の問い返し。[cite: 1]"},
+{"en": "It'll be fine.", "jp": "大丈夫じゃよ。[cite: 1]", "note": "心配はいらないとなだめる言葉。[cite: 1]"},
+{"en": "Thank you for trying, sir. I'm sure you did all you could.", "jp": "助けようとしてくださり感謝します、博士。全力を尽くしてくださったのでしょう。[cite: 1]", "note": "do all one could は「できる限りのことを全て行う」。ゴジ（アブラーの手先）の初登場。[cite: 1]"},
+{"en": "In the end, I just wasn't able to fix him.", "jp": "結局のところ、ワシにはあの子を直してやれなかったのじゃよ。[cite: 1]", "note": "In the end は「結局のところ、最後には」。[cite: 1]"},
+{"en": "Please don't blame yourself.", "jp": "どうかご自分を責めないでください。[cite: 1]", "note": "blame oneself は「自分自身を責める、後悔する」。[cite: 1]"},
+{"en": "I was able to use his onboard GPS to track him before it failed.", "jp": "GPSが停止する前に、内蔵GPSを使って追跡できたのです。[cite: 1]", "note": "onboard GPS（内蔵GPS）。track は「〜を追跡する」。fail は「（機械や機能が）停止する、故障する」。[cite: 1]"},
+{"en": "Who would've guessed the search would bring me to the great Professor Ochanomizu himself?", "jp": "まさか捜索の果てに、あのお偉いお茶の水博士ご本人の元へ辿り着くとは夢にも思いませんでしたよ。[cite: 1]", "note": "Who would have guessed...? は「一体誰が予想できただろうか（誰も予想しなかった）」。bring someone to... で「人を〜へと導く」。[cite: 1]"},
+{"en": "Here, I made us some tea.", "jp": "お茶を淹れたよ、どうぞ。[cite: 1]", "note": "make someone tea で「お茶を淹れる」。[cite: 1]"},
+{"en": "Thank you, but, no.", "jp": "お心遣い感謝しますが、結構です。[cite: 1]", "note": "丁寧なお断り表現。[cite: 1]"},
+{"en": "Because you're a robot? Unless I'm wrong.", "jp": "お前さんがロボットだからかね？ ワシの見立てが間違っていなければだが。[cite: 1]", "note": "Unless I'm wrong は「ワシの勘違いでなければ、見当違いでなければ」。お茶の水博士は一目でゴジの異変（ロボットであること）を見抜く。[cite: 1]"},
+{"en": "Tell me. Were you sad?", "jp": "教えてください。貴方は悲しかったですか？[cite: 1]", "note": "不気味な質問。[cite: 1]"},
+{"en": "Huh?", "jp": "なんじゃと？[cite: 1]", "note": "唐突な質問に対する驚き。[cite: 1]"},
+{"en": "The dog. When it died because you failed it, did that make you feel sad?", "jp": "あの犬ですよ。貴方が助けられずに死んだとき、悲しいと感じましたか？[cite: 1]", "note": "fail は「（助けられず）見捨てる、裏切る」。make someone feel sad（人を悲しい気持ちにさせる）。[cite: 1]"},
+{"en": "How sad were you during the war? A lot of robots died then.", "jp": "戦争中、貴方はどれほど悲しかったのですか？ あの時も多くのロボットが死にましたね。[cite: 1]", "note": "第39次中アジア戦争（ペルシア戦争）を指す不吉な言及。[cite: 1]"},
+{"en": "Who are you? Out with it!", "jp": "お前さんは一体誰だ？ 正体を明かしなさい！[cite: 1]", "note": "Out with it! は「白状しろ！ さっさと吐け！ 正体を明かせ！」という強い詰問の口語フレーズ。[cite: 1]"},
+{"en": "You want to know who I am?", "jp": "私がいったい誰なのか、知りたいのですか？[cite: 1]", "note": "静かに問い返すゴジ。[cite: 1]"},
+{"en": "You may refer to me as Goji.", "jp": "『ゴジ』とお呼びいただきましょう。[cite: 1]", "note": "refer to A as B は「AをBと呼ぶ、言及する」。ペルシアの伝説のロボット開発者「ゴジ博士」の名の提示。[cite: 1]"},
+{"en": "Can it be? The very man responsible for the Kingdom of Persia's robot army.", "jp": "まさか…ペルシア王国のロボット兵器群を作り上げた、あの男なのか！？[cite: 1]", "note": "Can it be...? は「まさか〜ではあるまいな！」。the very man は「まさにその男（強調）」。be responsible for... で「〜に責任がある、〜を手掛けた」。[cite: 1]"},
+{"en": "It would be a very easy thing for me to kill you, Professor,", "jp": "博士、貴方を殺すことなど私には造作もないことです。[cite: 1]", "note": "It would be an easy thing for me to...（〜することなど私にとって容易い）。[cite: 1]"},
+{"en": "which is why you're going to summon Atom.", "jp": "だからこそ、貴方にはアトムを呼び出していただく。[cite: 1]", "note": "which is why... は「そういうわけで〜なのだ」。summon は「（人を）召喚する、呼び寄せる」。[cite: 1]"},
+{"en": "I know someone who's eager to battle him.", "jp": "アトムと戦うのを心待ちにしている者がおりましてね。[cite: 1]", "note": "be eager to... は「しきりに〜したがっている、熱望している」。プルートゥのことを指す。[cite: 1]"},
+{"en": "You really think I'm gonna summon the boy because I fear for my life?", "jp": "ワシが自分の命が惜しいからといって、あの子を呼ぶとでも思っているのか！？[cite: 1]", "note": "fear for one's life は「自分の命を案じる、命を惜しむ」。gonna は going to。[cite: 1]"},
+{"en": "I'm not calling Atom here to fight, and there's nothing you can do about it!", "jp": "アトムを戦わせるために呼ぶことなど絶対になん！ お前に何と言われようとな！[cite: 1]", "note": "there's nothing you can do about it は「お前にどうすることもできん、手出しはさせん」。[cite: 1]"},
+{"en": "Ah, I should've explained it more clearly.", "jp": "ああ、もっと分かりやすく説明すべきでしたね。[cite: 1]", "note": "should have + 過去分詞 は「〜すべきだった（のにしなかった）」という後悔・訂正の構文。[cite: 1]"},
+{"en": "Huh?", "jp": "何だと？[cite: 1]", "note": "疑問の声を上げるお茶の水博士。[cite: 1]"},
+{"en": "Atom's opponent does not lie in wait for him here.", "jp": "アトムの対戦相手は、ここで待ち構えているわけではありません。[cite: 1]", "note": "lie in wait for... は「〜を待ち伏せする、狙って潜む」。[cite: 1]"},
+{"en": "He waits within a tornado striking elsewhere in Japan.", "jp": "日本の別の場所を襲っている竜巻の中で待っているのです。[cite: 1]", "note": "strike は「（災害や竜巻が）襲う、発生する」。elsewhere は「他の場所で」。[cite: 1]"},
+{"en": "Hey, Mom, are we okay?", "jp": "ねえママ、僕たち大丈夫なの？[cite: 1]", "note": "タカシが母親に不安そうに尋ねるシーン。[cite: 1]"},
+{"en": "It's getting closer.", "jp": "竜巻が近づいてるよ。[cite: 1]", "note": "It's getting closer（（竜巻が）近づいてきている）。[cite: 1]"},
+{"en": "A tornado within sight of your grandson.", "jp": "貴方のお孫さんの目と鼻の先にある竜巻ですよ。[cite: 1]", "note": "within sight of... は「〜の視界に入る場所で、〜の目と鼻の先で」。[cite: 1]"},
+{"en": "You can make whatever kind of threats you want.", "jp": "どんな脅しをかけようと好きにするがいい！[cite: 1]", "note": "make threats は「脅迫する、脅しをかける」。whatever kind of... で「どんな種類の〜であれ」。[cite: 1]"},
+{"en": "No matter what happens, I'll never let Atom do battle with another robot!", "jp": "何が起ころうとも、ワシは絶対にアトムを他のロボットと戦わせはせん！[cite: 1]", "note": "No matter what happens は「たとえ何が起ころうとも」。let + 人 + 動詞の原形（使役：〜させる）。do battle with... で「〜と戦う」。[cite: 1]"},
+{"en": "You said before that your name is Goji.", "jp": "お前さんは先ほど自分の名をゴジと言ったな。[cite: 1]", "note": "相手の発言を確認する構文。[cite: 1]"},
+{"en": "So the Kingdom of Persia's genius robot-maker was one himself, then!", "jp": "ではペルシア王国の天才ロボット開発者自身が、ロボットだったというわけか！[cite: 1]", "note": "was one (a robot) himself（彼自身がロボットだった）。[cite: 1]"},
+{"en": "Genius might be something of an exaggeration.", "jp": "『天才』というのは少々オーバー（誇張）かもしれませんがね。[cite: 1]", "note": "something of an exaggeration は「いくらか誇張めいたもの、オーバーな表現」。[cite: 1]"},
+{"en": "But at the very least… I made a robot that can generate tornadoes.", "jp": "ですが少なくとも…私は竜巻を発生させられるロボットを作り出しました。[cite: 1]", "note": "at the very least は「少なくとも」。generate tornadoes は「竜巻を発生させる」。プルートゥの能力の吐露。[cite: 1]"},
+{"en": "Mmm, what is it, Bobby?", "jp": "どうしたの、ボビー？[cite: 1]", "note": "タカシの犬型ロボット・ボビーが異変を察知して唸る。[cite: 1]"},
+{"en": "A robot that murders with absolute impunity.", "jp": "絶対的な『不問（お咎めなし）』のもとで殺人を犯すロボットですよ。[cite: 1]", "note": "with absolute impunity は「絶対にお咎めを受けることなく、罰せられずに、不問のまま」。impunity（刑罰・損害を免れること）。[cite: 1]"},
+{"en": "Robots cannot kill human beings.", "jp": "ロボットは人間を殺すことはできん！[cite: 1]", "note": "ロボット原則の提示。[cite: 1]"},
+{"en": "Why is that?", "jp": "なぜですか？[cite: 1]", "note": "せせら笑うように問うゴジ。[cite: 1]"},
+{"en": "Because we don't even give them the option to.", "jp": "選択肢すら与えていないからだ！[cite: 1]", "note": "give someone the option to... で「〜する選択肢を与える」。[cite: 1]"},
+{"en": "Article 13 of the International Robot Laws.", "jp": "国際ロボット法第13条じゃ！[cite: 1]", "note": "Article 13 は「第13条」。International Robot Laws は「国際ロボット法」。[cite: 1]"},
+{"en": "AI was developed with built-in systems to keep humans safe.", "jp": "人工知能は人間の安全を守る安全装置（組み込みシステム）とともに開発されている！[cite: 1]", "note": "built-in system は「組み込みシステム、安全装置」。keep humans safe で「人間を安全に保つ」。[cite: 1]"},
+{"en": "We left none of it to chance. I can promise you that.", "jp": "万が一の隙も残してはおらん。断言できる！[cite: 1]", "note": "leave nothing to chance は「万事に万全を期す、運任せ（偶然）にしない」という重要表現。I can promise you that は「断言する、約束する」。[cite: 1]"},
+{"en": "Simply wonderful.", "jp": "実に素晴らしい。[cite: 1]", "note": "皮肉たっぷりの生半可な感嘆。[cite: 1]"},
+{"en": "Professor Ochanomizu, you really are a titan within the field of robotics.", "jp": "お茶の水博士、貴方はまさにロボット工学界の『巨人（泰斗）』ですね。[cite: 1]", "note": "titan は「巨人、大物、泰斗」。field of robotics は「ロボット工学の分野」。[cite: 1]"},
+{"en": "Your creations are some of the most advanced to walk the earth.", "jp": "貴方の生み出した作品は、この地球上を歩む最も高度なロボットたちだ。[cite: 1]", "note": "creation は「創作物、作品」。walk the earth で「地球上に存在する、歩む」。[cite: 1]"},
+{"en": "The divide between robot and man is shrinking.", "jp": "ロボットと人間の境界線（隔たり）は縮まっています。[cite: 1]", "note": "divide は名詞で「隔たり、分界線」。shrink は「縮む、小さくなる」。[cite: 1]"},
+{"en": "What do you think will happen when robots get really close to human?", "jp": "ロボットが人間に極限まで近づいたとき、一体何が起こると思いますか？[cite: 1]", "note": "get really close to... で「〜に極めて近づく、酷似する」。[cite: 1]"},
+{"en": "Even when they're almost us, robots will never kill humans!", "jp": "たとえ人間に限りなく近づこうとも、ロボットが人間を殺すことなど絶対にない！[cite: 1]", "note": "Even when... は「〜の時でさえ」。almost us で「ほぼワシら人間（と同じ）」。[cite: 1]"},
+{"en": "What is it that lets you cling to such a blinkered view?", "jp": "何が貴方をそれほどまでに不透明で視野の狭い見解に固執させるのですかね？[cite: 1]", "note": "What is it that...? は強調構文の疑問形（一体何が〜なのか？）。cling to... は「〜に固執する、しがみつく」。blinkered view は「（馬の目隠しのように）視野の狭い見解、偏狭な見方」。[cite: 1]"},
+{"en": "I have to wonder.", "jp": "不思議でたまりませんよ。[cite: 1]", "note": "I have to wonder は「どうしても考えて（疑って）しまう」。[cite: 1]"},
+{"en": "Maybe you're an optimist. Or just a raging hypocrite.", "jp": "貴方はただの能天気な楽天家なのか…それともとんでもない偽善者なのか。[cite: 1]", "note": "optimist は「楽天家」。raging hypocrite は「手厳しい偽善者、救いがたい偽善者」。raging は「荒れ狂う、最悪な」という強調形容詞。[cite: 1]"},
+{"en": "Shall we test your hypothesis right here and now?", "jp": "今ここで、貴方の仮説を実験してみましょうか？[cite: 1]", "note": "test one's hypothesis で「仮説を検証・実験する」。right here and now は「今まさにこの場で」。[cite: 1]"},
+{"en": "Can I kill you? Yes or no.", "jp": "私が貴方を殺せるかどうか。イエスかノーか。[cite: 1]", "note": "恐ろしい命のテスト。[cite: 1]"},
+{"en": "What's your endgame, Goji?", "jp": "お前さんの最終目的（狙い）は何なんじゃ、ゴジ！？[cite: 1]", "note": "endgame は「（チェスなどの）詰み、最終局面、最終目的・狙い」を指す超重要表現。[cite: 1]"},
+{"en": "Who are you even?", "jp": "お前さんは一体全体何者なんだ？[cite: 1]", "note": "Who are you even? は「一体全体、お前は何者なんだ？」という困惑を極めた問い。[cite: 1]"},
+{"en": "The 39th Central Asian War started because of rumors that were swirling around you and your work.", "jp": "第39次中アジア戦争は、お前さんとお前さんの研究の周りに渦巻いた噂のせいで始まったんじゃぞ！[cite: 1]", "note": "swirl around... は「〜の周りに渦巻く」。39th Central Asian War（第39次中アジア戦争）。[cite: 1]"},
+{"en": "They said you built an army of advanced robots for the Kingdom of Persia,", "jp": "お前がペルシア王国のために高度なロボット軍団を作り上げたと噂された、[cite: 1]", "note": "army of advanced robots（高度ロボット軍団）。[cite: 1]"},
+{"en": "as well as other robots that were intended for use as weapons of mass destruction.", "jp": "大量無差別破壊兵器として使用されるための他のロボット群もな！[cite: 1]", "note": "weapons of mass destruction は「大量破壊兵器（WMD）」。be intended for use as... で「〜としての使用を意図されている」。[cite: 1]"},
+{"en": "All those rumors, where did they come from?", "jp": "それらの噂は、一体どこから出たものなんじゃ！？[cite: 1]", "note": "噂の根源を正すお茶の水博士。[cite: 1]"},
+{"en": "The United States of Thracia.", "jp": "トラキア合衆国ですよ。[cite: 1]", "note": "噂を流した主犯（トラキア合衆国）を明かすゴジ。[cite: 1]"},
+{"en": "And does Thracia have a perfect record of telling the truth?", "jp": "ではトラキアがこれまで一度も嘘をつかず真実だけを言ってきたとでも？[cite: 1]", "note": "have a perfect record of -ing で「完璧に〜してきた記録・実績がある」。[cite: 1]"},
+{"en": "No. That's why we sent over the fact-finding mission.", "jp": "違う！ だからこそワシらは現地調査団を現地に派遣したんじゃ！[cite: 1]", "note": "That's why... で「そういうわけで〜なのだ」。fact-finding mission（現地事実調査団）。[cite: 1]"},
+{"en": "And did you find what they said?", "jp": "精神的に追い詰める問い掛け。[cite: 1]", "note": "「彼らの言った通りのものは見つかりましたか？」[cite: 1]"},
+{"en": "We did not.", "jp": "何も見つからなかったよ。[cite: 1]", "note": "噂の否定（兵器など存在しなかった）。[cite: 1]"},
+{"en": "There was a huge pile of junked robots but no weaponry.", "jp": "破棄されたロボットの巨大な山があっただけで、兵器などどこにもなかった！[cite: 1]", "note": "huge pile of junked robots で「ガラクタロボットの巨大な山」。weaponry（兵器群）。[cite: 1]"},
+{"en": "You found nothing. And the Kingdom of Persia burned anyway.", "jp": "何も見つからなかった。それでもペルシア王国は焼き尽くされた。[cite: 1]", "note": "burn anyway で「結局焼き払われた」。戦争の不条理を突くセリフ。[cite: 1]"},
+{"en": "Is this your vengeance, then?", "jp": "では、これがワシらへの復讐というわけか！？[cite: 1]", "note": "vengeance は「復讐、報復（revenge より重くお堅い表現）」。[cite: 1]"},
+{"en": "You're picking off the former members of the Bora Fact-Finding Mission one by one.", "jp": "お前はボラ調査団の元メンバーを一人ずつ狙い撃ちにして抹殺しているんじゃな！[cite: 1]", "note": "pick off... は「（狙撃などで）〜を一人ずつ狙い撃ちにする、片っ端から消す」。one by one で「一人ずつ」。[cite: 1]"},
+{"en": "Is that your game, Goji?", "jp": "それがお前の企みなのだな、ゴジ！？[cite: 1]", "note": "Is that your game? は「それがお前の狙い（企み）か？」という口語フレーズ。[cite: 1]"},
+{"en": "Is that what this is? You're trying to destroy Atom and the robots like him", "jp": "アトムや彼のようなロボットたちを破壊しようとしているのは、[cite: 1]", "note": "destroy Atom and the robots like him（アトムや彼のようなロボットを破壊する）。[cite: 1]"},
+{"en": "because they aided the peacekeeping force one way or another.", "jp": "彼らが何らかの形で平和維持軍（国連軍）に協力したからなのか！？[cite: 1]", "note": "aid は「〜を援助・支援する」。peacekeeping force（平和維持軍）。one way or another で「何らかの形で、どうにかして」。[cite: 1]"},
+{"en": "There, you see? Your theory is without merit.", "jp": "ほら、ごらんなさい。貴方の推理（理論）には価値（根拠）がありませんよ。[cite: 1]", "note": "without merit は「価値がない、根拠がない、見当違いだ」。[cite: 1]"},
+{"en": "Huh?", "jp": "何だと？[cite: 1]", "note": "予期せぬ否定に対する驚き。[cite: 1]"},
+{"en": "If I can seek revenge, why not murder?", "jp": "私に『復讐心』を抱くことができるなら、なぜ『殺人』はできないとお考えなのです？[cite: 1]", "note": "seek revenge で「復讐を企てる・求める」。ロボットが復讐（感情）を持てるなら殺人も可能なはずだという論理の矛盾の指摘。[cite: 1]"},
+{"en": "Oh. Hey, Grandpa. I have a question.", "jp": "あ、もしもしおじいちゃん。質問があるんだけど。[cite: 1]", "note": "電話越しでのタカシの無邪気な問いかけ。[cite: 1]"},
+{"en": "Do tornadoes ever stay in one place for a while?", "jp": "竜巻って、同じ場所にずっと留まり続けることってあるの？[cite: 1]", "note": "stay in one place で「一箇所に留まる」。for a while で「しばらくの間」。[cite: 1]"},
+{"en": "And Bobby's eyes, they started to glow, and they won't stop.", "jp": "あとね、ボビーの目が光り始めて、ずっと消えないんだよ。[cite: 1]", "note": "glow は「（光を放って）輝く、光る」。won't stop で「どうしても止まらない」。緊急信号の発信を示唆。[cite: 1]"},
+{"en": "You're going to send in Atom any minute now, Professor.", "jp": "博士、貴方は今すぐにでもアトムを向かわせるはずです。[cite: 1]", "note": "send in... で「（現場に）〜を送り込む、派遣する」。any minute now で「今すぐにでも、今か今かと」。[cite: 1]"},
+{"en": "Bobby's a smart dog. Follow his lead, Takashi.", "jp": "ボビーは賢い犬じゃ。ボビーの言う通りにするんじゃぞ、タカシ！[cite: 1]", "note": "follow one's lead は「人の指示・誘導に従う、手本に倣う」という重要イディオム。[cite: 1]"},
+{"en": "I'll call you back a little bit later.", "jp": "後で必ずかけ直すからな！[cite: 1]", "note": "call someone back で「（人に）掛け直す」。a little bit later（後で少し経ったら）。[cite: 1]"},
+{"en": "About time they arrived.", "jp": "そろそろ彼らが到着する頃ですね。[cite: 1]", "note": "It is about time (that)... は「そろそろ〜する時間だ」。[cite: 1]"},
+{"en": "The police, I mean.", "jp": "警察のことですよ。[cite: 1]", "note": "警察の包囲網を察知しているゴジ。[cite: 1]"},
+{"en": "You killed Yujiro out there, didn't you?", "jp": "表にいた裕次郎を殺したのか…！？[cite: 1]", "note": "out there で「（家の）外で、表で」。裕次郎の安否を尋ねる。[cite: 1]"},
+{"en": "Squad B, circle to the back.", "jp": "B分隊、裏手に回り込め！[cite: 1]", "note": "Squad B は「B分隊・Bチーム」。circle to the back で「裏手へ旋回する・回り込む」。[cite: 1]"},
+{"en": "They'd only rush over here under one scenario. If Yujiro's signal went dead.", "jp": "彼らがここへ急行してくるシナリオは一つしかない。裕次郎のシグナルが途絶えた時じゃ！[cite: 1]", "note": "rush over here で「ここへ急行する」。under one scenario（一つのシナリオ・状況下で）。go dead で「（通信・心拍などが）途絶える、不通になる」。[cite: 1]"},
+{"en": "Squad C, below the veranda.", "jp": "C分隊、ベランダの下へ！[cite: 1]", "note": "below the veranda（ベランダの下に）。警察の強行突入指示。[cite: 1]"},
+{"en": "Professor Ochanomizu.", "jp": "お茶の水博士。[cite: 1]", "note": "静かに呼びかけるゴジ。[cite: 1]"},
+{"en": "Were you just running down the clock?", "jp": "貴方はただ時間を稼いで（警察の到着を待って）いただけですか？[cite: 1]", "note": "run down the clock (or run out the clock) は「（スポーツや交渉で）時間を稼ぐ、タイムアップまで時間を消費する」という超重要ビジネス・口語イディオム。[cite: 1]"},
+{"en": "Squad A has secured the property's entrance.", "jp": "A分隊、敷地の入り口を確保しました！[cite: 1]", "note": "secure the entrance で「入り口を確保・封鎖する」。property は「敷地、不動産」。[cite: 1]"},
+{"en": "Here, Professor!", "jp": "博士、こちらです！[cite: 1]", "note": "アトムが窓から駆けつけるシーン。[cite: 1]"},
+{"en": "How on earth--", "jp": "一体全体どうやって--[cite: 1]", "note": "How on earth...? は「一体全体どうやって…？（驚愕）」。[cite: 1]"},
+{"en": "Come back!", "jp": "待て！ 戻れ！[cite: 1]", "note": "逃走するゴジに向かって叫ぶアトム。[cite: 1]"},
+{"en": "No! Let him go, Atom!", "jp": "アトム、追うな！ 行かせなさい！[cite: 1]", "note": "Let him go は「彼を行かせろ、放っておけ」。アトムの危険を察して制止するお茶の水博士。[cite: 1]"},
+{"en": "Take him out!", "jp": "奴を仕留めろ（射殺しろ）！[cite: 1]", "note": "take someone out は「（敵や標的を）倒す、仕留める、殺害する」という警察・軍事スラング。[cite: 1]"},
+{"en": "Hurry up! Don't let him get away!", "jp": "急げ！ 逃がすな！[cite: 1]", "note": "get away で「逃亡する、逃げ出す」。[cite: 1]"},
+{"en": "Oh no! He didn't hurt you, did he?", "jp": "そんな！ 博士、怪我はありませんでしたか！？[cite: 1]", "note": "hurt は「傷つける、痛めつける」。付加疑問文 didn't he?（怪我はありませんでしたね？）。[cite: 1]"},
+{"en": "I'm fine, my boy. But how did you know to come here?", "jp": "ワシは無事じゃよ。だが、どうしてここへ来ることが分かったんだい？[cite: 1]", "note": "my boy は親しみを込めた「アトム（我が子よ）」。how did you know to... で「どうやって〜だと分かったのか」。[cite: 1]"},
+{"en": "It was because of Bobby. Takashi's dog sent out an emergency transmission.", "jp": "ボビーのおかげです。タカシくんの犬が緊急信号を発信したんです。[cite: 1]", "note": "because of... で「〜のおかげで、〜が原因で」。emergency transmission（緊急送信・シグナル）。[cite: 1]"},
+{"en": "When I heard it, I called the police immediately. I wasn't sure, but I thought something bad might be happening.", "jp": "それを聞いてすぐに警察へ連絡しました。確信はありませんでしたが、何か悪いことが起きていると思ったんです。[cite: 1]", "note": "call the police immediately（すぐに警察に通報する）。something bad might be happening（何か悪いことが起きているかもしれない）。[cite: 1]"},
+{"en": "Clever lad. Thank the stars.", "jp": "賢い子じゃ。ああ、天（神様）に感謝じゃよ。[cite: 1]", "note": "Clever lad は「賢い子じゃ」。Thank the stars (or Thank one's lucky stars) は「（幸運・天に）感謝する、命拾いした」という定番の感謝表現。[cite: 1]"},
+{"en": "So that's why you rushed over.", "jp": "だから急いで駆けつけてくれたんじゃな。[cite: 1]", "note": "rush over で「大急ぎで駆けつける」。[cite: 1]"},
+{"en": "What do you mean, 'Thank the stars?' I don't get it.", "jp": "『天に感謝』ってどういう意味ですか？ 僕にはわかりません。[cite: 1]", "note": "I don't get it は「（意味が）理解できません、わかりません」。言葉通りに受け止めるアトムの純粋さ。[cite: 1]"},
+{"en": "No need.", "jp": "気にしなくていいんじゃよ（分からんでもよい）。[cite: 1]", "note": "No need (to understand) の省略。[cite: 1]"},
+{"en": "So why is Bobby freaking out?", "jp": "でも、どうしてボビーはパニックを起こしているんだろう？[cite: 1]", "note": "freak out は「パニックになる、激しく取り乱す」という超頻出口語表現。[cite: 1]"},
+{"en": "We found him!", "jp": "奴を見つけたぞ！[cite: 1]", "note": "ゴジの躯体を発見した警官の叫び。[cite: 1]"},
+{"en": "Ah! Cockroaches!", "jp": "うわっ！ ゴキブリだ！[cite: 1]", "note": "ゴジの体から大量のゴキブリ（ナノマシン/小型機械群）が溢れ出る気味の悪いシーン。[cite: 1]"},
+{"en": "I could swear they carried something off with them.", "jp": "誓ってもいいが、奴らは何かを持ち去ったぞ！[cite: 1]", "note": "I could swear... で「絶対に〜だ、誓ってもいい」。carry off with them（連れ去る、持ち去る）。電子頭脳（AI）を持ち去ったことを示す。[cite: 1]"},
+{"en": "Hey, check it out. -Huh?", "jp": "おい、これを見ろ！ -え？[cite: 1]", "note": "check it out は「（確認するために）これを見てみろ、チェックしろ」。[cite: 1]"},
+{"en": "His AI is missing.", "jp": "彼のAI（電子頭脳）が消えている！[cite: 1]", "note": "be missing で「行方不明だ、欠落している、消えている」。抜け殻（マリオネット）の判明。[cite: 1]"},
+{"en": "Uran went to check on Takashi?", "jp": "ウランがタカシの様子を見に行ったのかい！？[cite: 1]", "note": "check on someone で「（人の）様子を見に行く、安全を確認する」。Part 1の締めくくりのセリフ。[cite: 1]"}
+ ];
+
+ // ---- データマイグレーションと初期化 ----
+ const savedEvaluated = localStorage.getItem('pluto_4_1_evaluated');
+ const savedDates = localStorage.getItem('pluto_4_1_dates');
+ const savedSrs = localStorage.getItem('pluto_4_1_srs');
+
+ let evaluatedCards = savedEvaluated ? JSON.parse(savedEvaluated) : new Array(cardsData.length).fill(false);
+ let answerDates = savedDates ? JSON.parse(savedDates) : new Array(cardsData.length).fill(null);
+ 
+let srsData = savedSrs ? JSON.parse(savedSrs) : new Array(cardsData.length).fill(null).map(() => ({
+ interval: 0,
+ ease: 2.5,
+ repetitions: 0,
+ nextReview: null
+ }));
+
+ let currentCardIndex = 0;
+ let correctCount = evaluatedCards.filter(Boolean).length;
+ let isFront = true;
+ let currentMode = 'all'; // 'all', 'unanswered', 'review', 'incorrect'
+
+ const frontSide = document.getElementById('front-side');
+ const backSide = document.getElementById('back-side');
+ const frontEngContent = document.getElementById('front-eng-content');
+ const backEngContent = document.getElementById('back-eng-content');
+ const japContent = document.getElementById('jap-content');
+ const noteContent = document.getElementById('note-content');
+ 
+const controlsFront = document.getElementById('controls-front');
+ const controlsBack = document.getElementById('controls-back');
+ const progressText = document.getElementById('progress-text');
+ const scoreText = document.getElementById('score-text');
+ const playBtn = document.getElementById('play-audio-btn');
+ const dateBadge = document.getElementById('date-badge');
+ const srsBadge = document.getElementById('srs-badge');
+ const modeIndicator = document.getElementById('mode-indicator');
+
+ function saveProgress() {
+ localStorage.setItem('pluto_4_1_evaluated', JSON.stringify(evaluatedCards));
+ localStorage.setItem('pluto_4_1_dates', JSON.stringify(answerDates));
+ localStorage.setItem('pluto_4_1_srs', JSON.stringify(srsData));
+ }
+
+ // YYYY-MM-DD 形式で日付を取得（比較用）
+ function getTodayStringFormatted() {
+ const d = new Date();
+ const y = d.getFullYear();
+ const m = String(d.getMonth() + 1).padStart(2, '0');
+ const day = String(d.getDate()).padStart(2, '0');
+ return `${y}-${m}-${day}`;
+ }
+
+ // 指定日数を足した日付文字列を返す
+ function addDaysToDate(days) {
+ const d = new Date();
+ d.setDate(d.getDate() + days);
+ const y = d.getFullYear();
+ const m = String(d.getMonth() + 1).padStart(2, '0');
+ const day = String(d.getDate()).padStart(2, '0');
+ return `${y}-${m}-${day}`;
+ }
+
+ function getVisibleIndices() {
+ let indices = [];
+ const today = getTodayStringFormatted();
+ 
+for (let i = 0; i < cardsData.length; i++) {
+ if (currentMode === 'all') {
+ indices.push(i);
+ } else if (currentMode === 'unanswered') {
+ if (!answerDates[i]) indices.push(i);
+ } else if (currentMode === 'incorrect') {
+ if (answerDates[i] && !evaluatedCards[i]) indices.push(i);
+ } else if (currentMode === 'review') {
+ // 次回の復習日が設定されていて、かつ今日以前の場合
+ if (srsData[i].nextReview && srsData[i].nextReview <= today) {
+ indices.push(i);
+ }
+ }
+ }
+ return indices;
+ }
+
+ function updateUI() {
+ let indices = getVisibleIndices();
+ 
+if (indices.length === 0) {
+ frontSide.style.display = 'flex';
+ backSide.style.display = 'none';
+ controlsFront.style.display = 'none';
+ controlsBack.style.display = 'none';
+ frontEngContent.innerHTML = "<div class='empty-state'>🎉 このモードの対象カードはありません！<br>上のボタンから別のモードに切り替えてね。</div>";
+ dateBadge.style.display = 'none';
+ srsBadge.style.display = 'none';
+ playBtn.style.display = 'none';
+ progressText.textContent = `- / ${cardsData.length}`;
+ scoreText.textContent = `正解数: ${correctCount}`;
+ return;
+ }
+
+ dateBadge.style.display = 'inline-block';
+ srsBadge.style.display = 'block';
+ playBtn.style.display = 'flex';
+
+ if (!indices.includes(currentCardIndex)) {
+ currentCardIndex = indices[0];
+ }
+
+ let pos = indices.indexOf(currentCardIndex);
+ progressText.textContent = `${pos + 1} / ${indices.length} (全${cardsData.length}問)`;
+ scoreText.textContent = `正解数: ${correctCount}`;
+
+ let dateStr = answerDates[currentCardIndex];
+ dateBadge.textContent = dateStr ? `最終回答日：${dateStr}` : `最終回答日：未回答`;
+
+ let srs = srsData[currentCardIndex];
+ if (srs.nextReview) {
+ srsBadge.textContent = `次回予定日: ${srs.nextReview} (連続正解: ${srs.repetitions}回)`;
+ } else {
+ srsBadge.textContent = `まだSRSに登録されていません`;
+ }
+
+ if (isFront) {
+ frontSide.style.display = 'flex';
+ backSide.style.display = 'none';
+ controlsFront.style.display = 'flex';
+ controlsBack.style.display = 'none';
+ } else {
+ frontSide.style.display = 'none';
+ backSide.style.display = 'flex';
+ controlsFront.style.display = 'none';
+ controlsBack.style.display = 'flex';
+ }
+
+ frontEngContent.textContent = cardsData[currentCardIndex].en;
+ backEngContent.textContent = cardsData[currentCardIndex].en;
+ japContent.textContent = cardsData[currentCardIndex].jp;
+ 
+if (cardsData[currentCardIndex].note) {
+ noteContent.style.display = 'block';
+ noteContent.textContent = "💡 " + cardsData[currentCardIndex].note;
+ } else {
+ noteContent.style.display = 'none';
+ }
+ }
+
+ function flipCard() {
+ isFront = !isFront;
+ updateUI();
+ }
+
+ function returnToFront() {
+ isFront = true;
+ updateUI();
+ }
+
+ function advanceCard(forward) {
+ let indices = getVisibleIndices();
+ if (indices.length === 0) {
+ updateUI();
+ return;
+ }
+
+ let pos = indices.indexOf(currentCardIndex);
+ 
+if (pos !== -1) {
+ if (forward) {
+ currentCardIndex = indices[(pos + 1) % indices.length];
+ } else {
+ // 前へボタンのループ処理
+ currentCardIndex = indices[(pos - 1 + indices.length) % indices.length];
+ }
+ } else {
+ let nextIdx = indices.find(i => i > currentCardIndex);
+ currentCardIndex = nextIdx !== undefined ? nextIdx : indices[0];
+ }
+ 
+isFront = true;
+ updateUI();
+ }
+
+ function nextCard() { advanceCard(true); }
+ function prevCard() { advanceCard(false); }
+
+ function markCorrect() {
+ // 従来のカウント用処理
+ let wasCorrect = evaluatedCards[currentCardIndex];
+ if (!wasCorrect) {
+ correctCount++;
+ evaluatedCards[currentCardIndex] = true;
+ }
+ answerDates[currentCardIndex] = getTodayStringFormatted();
+
+ // SRS (SM-2) アルゴリズムによる「完璧！」の処理
+ let cardSrs = srsData[currentCardIndex];
+ cardSrs.repetitions += 1;
+ 
+if (cardSrs.repetitions === 1) {
+ cardSrs.interval = 1; // 初回は1日後
+ } else if (cardSrs.repetitions === 2) {
+ cardSrs.interval = 6; // 2回目は6日後
+ } else {
+ cardSrs.interval = Math.round(cardSrs.interval * cardSrs.ease);
+ }
+ cardSrs.nextReview = addDaysToDate(cardSrs.interval);
+
+ saveProgress();
+ nextCard();
+ }
+
+ function markIncorrect() {
+ // 従来のカウント用処理
+ let wasCorrect = evaluatedCards[currentCardIndex];
+ if (wasCorrect) {
+ correctCount--;
+ evaluatedCards[currentCardIndex] = false;
+ }
+ answerDates[currentCardIndex] = getTodayStringFormatted();
+
+ // SRS (SM-2) アルゴリズムによる「覚えてない」の処理
+ let cardSrs = srsData[currentCardIndex];
+ cardSrs.repetitions = 0; // 連続正解リセット
+ cardSrs.interval = 1; // 翌日に再出題
+ cardSrs.ease = Math.max(1.3, cardSrs.ease - 0.2); // 定着度（難易度係数）を下げる
+ cardSrs.nextReview = addDaysToDate(cardSrs.interval);
+
+ saveProgress();
+ nextCard();
+ }
+
+ function setMode(mode) {
+ currentMode = mode;
+ 
+const modeNames = {
+ 'all': '📁 全問',
+ 'unanswered': '🆕 未回答',
+ 'review': '📅 今日の復習',
+ 'incorrect': '🎯 未正解'
+ };
+ modeIndicator.textContent = `現在のモード：${modeNames[mode]}`;
+
+ let indices = getVisibleIndices();
+ if (indices.length > 0) {
+ currentCardIndex = indices[0];
+ }
+ isFront = true;
+ updateUI();
+ }
+
+ function jumpToUnanswered() {
+ let indices = getVisibleIndices();
+ if (indices.length === 0) return;
+
+ let targetIndex = indices.find(index => !answerDates[index]);
+
+ if (targetIndex !== undefined) {
+ currentCardIndex = targetIndex;
+ } else {
+ currentCardIndex = indices[0];
+ }
+ 
+isFront = true;
+ updateUI();
+ }
+
+ function speakText() {
+ const textToSpeak = cardsData[currentCardIndex].en;
+ window.speechSynthesis.cancel();
+ const utterance = new SpeechSynthesisUtterance(textToSpeak);
+ utterance.lang = 'en-US';
+ utterance.rate = 0.9;
+ window.speechSynthesis.speak(utterance);
+ }
+
+ playBtn.addEventListener('click', speakText);
+
+ updateUI();
+ </script>
+</body>
+</html>
